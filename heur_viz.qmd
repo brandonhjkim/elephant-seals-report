@@ -1,0 +1,77 @@
+```{r}
+library(tidyverse)
+```
+
+```{r}
+seals <- read_csv('data/seals_count_joined.csv')
+
+seals <- seals %>%
+  drop_na()
+```
+
+```{r}
+seals %>%
+  filter(`Total Number of Seals` < 10) %>%
+ggplot(aes(x = `Total Number of Seals`)) +
+  geom_histogram(bins = 10, fill='#a679d6', color='black') +
+  scale_x_continuous(breaks=seq(min(seals$`Total Number of Seals`), max(seals$`Total Number of Seals`), by=1)) +
+  theme_bw() +
+  labs(x='Number of Seals in a Clump', y = '', title = 'Distribution of Clump Sizes', 
+       subtitle = paste('Mean:', round(mean(seals$`Total Number of Seals`),2), '|', 
+                        'Median:', round(median(seals$`Total Number of Seals`),2), '|',
+                        'SD:', round(sd(seals$`Total Number of Seals`),2))
+       ) 
+  # theme(
+  #   panel.background = element_rect(fill = "#fcecdDc"),
+  #   plot.background = element_rect(fill = "#fcecdc") # Changes entire plot background
+  # )
+```
+
+```{r}
+seals %>%
+  mutate(area = height*width) %>%
+  filter(`Total Number of Seals` %in% 1:6) %>%
+  ggplot(aes(x = as.factor(`Total Number of Seals`), y = area)) +
+    geom_boxplot(fill='#a679d6') +
+    labs(x = 'Clumps of Seals', y='', subtitle = 'Area in Pixels', title = 'Boxplots of Areas per Clump Size') +
+    theme_bw() 
+```
+
+```{r}
+train_anno <- read_csv('data/train_anno.csv')
+test_anno <- read_csv('data/test_anno.csv')
+valid_anno <- read_csv('data/valid_anno.csv')
+```
+
+```{r}
+anno <- train_anno %>% 
+  rbind(test_anno) %>%
+  rbind(valid_anno)
+```
+
+```{r}
+anno %>%
+  ggplot(aes(x = seal_annotations)) +
+  geom_histogram(bins=40, fill='#bae519') +
+  labs(x = 'Number of Lone Seals', 
+       y = '', 
+       title = 'Distribution of Number of Lone Seals Per Image', 
+       subtitle = paste('Mean:', round(mean(anno$seal_annotations),2), '|', 
+                        'Median:', round(median(anno$seal_annotations),2), '|',
+                        'SD:', round(sd(anno$seal_annotations),2))) +
+  theme_bw() 
+```
+
+```{r}
+anno %>%
+  ggplot(aes(x = clump_annotations)) +
+  geom_histogram(bins=40, fill='#a679d6') +
+  labs(x = 'Number of Clumps', 
+       y = '', 
+       title = 'Distribution of Number of Clumps Per Image', 
+       subtitle = paste('Mean:', round(mean(anno$clump_annotations),2), '|', 
+                        'Median:', round(median(anno$clump_annotations),2), '|',
+                        'SD:', round(sd(anno$clump_annotations),2))) +
+  theme_bw() 
+```
+
